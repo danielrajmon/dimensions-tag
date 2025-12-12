@@ -24,6 +24,7 @@ RUN echo '#!/bin/sh' > /app/start.sh && \
     echo '    listen 443 ssl;' >> /app/start.sh && \
     echo '    ssl_certificate /app/certs/SSLcertificate.crt;' >> /app/start.sh && \
     echo '    ssl_certificate_key /app/certs/SSLprivatekey.key;' >> /app/start.sh && \
+    echo '    ssl_trusted_certificate /app/certs/SSLIntermediateCertificate.crt;' >> /app/start.sh && \
     echo '    root /usr/share/nginx/html;' >> /app/start.sh && \
     echo '    index index.html;' >> /app/start.sh && \
     echo '    location / {' >> /app/start.sh && \
