@@ -151,21 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove spaces and non-hex characters, convert to uppercase
         let value = e.target.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
         
-        // Limit to 14 characters (12 hex + potential spaces)
+        // Limit to 14 hex characters (will become 17 with spaces: XXXX XXXX XXXX XX)
         if (value.length > 14) {
             value = value.substring(0, 14);
         }
         
-        // Format with spaces every 4 characters
+        // Format with spaces every 4 characters (14 hex chars + 3 spaces = 17 total)
         let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
         e.target.value = formatted;
         
-        // Validate length (should be exactly 14 hex characters)
-        const hexOnly = value.replace(/\s+/g, '');
-        if (hexOnly.length === 12) {
+        // Validate length (should be exactly 17 characters including spaces)
+        if (formatted.length === 17) {
             uidInput.style.borderColor = 'var(--success-color)';
             uidInput.style.boxShadow = '0 0 0 2px rgba(76, 175, 80, 0.2)';
-        } else if (hexOnly.length > 0) {
+        } else if (formatted.length > 0) {
             uidInput.style.borderColor = 'var(--error-color)';
             uidInput.style.boxShadow = '0 0 0 2px rgba(244, 67, 54, 0.2)';
         } else {
@@ -175,8 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     uidInput.addEventListener('blur', () => {
-        const hexOnly = uidInput.value.replace(/\s+/g, '');
-        if (hexOnly.length > 0 && hexOnly.length !== 14) {
+        if (uidInput.value.length > 0 && uidInput.value.length !== 17) {
             uidInput.style.borderColor = 'var(--error-color)';
         }
     });
