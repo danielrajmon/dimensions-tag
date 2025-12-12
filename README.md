@@ -57,12 +57,7 @@ npm run start
 
 ## Environment Variables
 
-- `NGINX_PORT` - Frontend port (default: 80)
-
-Example:
-```bash
-docker run -d -p 8080:8080 -e NGINX_PORT=8080 --name dimensions-tag-app dimensions-tag
-```
+None. The container runs on port 80 by default.
 
 ## Requirements
 
