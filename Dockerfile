@@ -21,7 +21,9 @@ RUN mkdir -p /run/nginx
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'cat > /etc/nginx/http.d/default.conf <<EOF' >> /app/start.sh && \
     echo 'server {' >> /app/start.sh && \
-    echo '    listen 80;' >> /app/start.sh && \
+    echo '    listen 443 ssl;' >> /app/start.sh && \
+    echo '    ssl_certificate /app/certs/SSLcertificate.crt;' >> /app/start.sh && \
+    echo '    ssl_certificate_key /app/certs/SSLprivatekey.key;' >> /app/start.sh && \
     echo '    root /usr/share/nginx/html;' >> /app/start.sh && \
     echo '    index index.html;' >> /app/start.sh && \
     echo '    location / {' >> /app/start.sh && \
@@ -42,6 +44,6 @@ RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'nginx -g "daemon off;"' >> /app/start.sh && \
     chmod +x /app/start.sh
 
-EXPOSE 80
+EXPOSE 443
 
 CMD ["/bin/sh", "/app/start.sh"]
