@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dimensions Tag Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧱 Dimensions Tag Generator</h1>
+            <p>Generate NFC tag data for Dimensions characters and vehicles</p>
+        </header>
+
+        <main>
+            <form id="tagForm">
+                <div class="form-group">
+                    <label for="uid">NFC Tag UID (Hexadecimal)</label>
+                    <input 
+                        type="text" 
+                        id="uid" 
+                        name="uid" 
+                        placeholder="04A1 B2C3 D4E5" 
+                        required
+                        minlength="14"
+                        maxlength="14"
+                        pattern="[0-9A-Fa-f]{4}\s[0-9A-Fa-f]{4}\s[0-9A-Fa-f]{4}"
+                        title="Enter a 12-character hexadecimal UID"
+                    >
+                    <small>Enter the 14-character unique identifier from your NFC tag</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" name="type" required>
+                        <option value="character">Character</option>
+                        <option value="vehicle">Vehicle</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="item">Select Item</label>
+                    <select id="item" name="item" required>
+                        <option value="">-- Select a character or vehicle --</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Generate Tag Data</button>
+            </form>
+
+            <div id="result" class="result hidden">
+                <h2>Generated Tag Data</h2>
+                <h3 id="itemName"></h3>
+                <div class="tag-info">
+                    <div id="characterBlocks" class="code-blocks">
+                        <div class="code-block">
+                            <label>Page 36 (0x24)</label>
+                            <div class="code-value">
+                                <span>A2 24</span>
+                                <span id="char1" class="hex-value"></span>
+                                <span id="char2" class="hex-value"></span>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <label>Page 37 (0x25)</label>
+                            <div class="code-value">
+                                <span>A2 25</span>
+                                <span id="char3" class="hex-value"></span>
+                                <span id="char4" class="hex-value"></span>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <label>Page 43 (0x2B) - Password</label>
+                            <div class="code-value">
+                                <span>A2 2B</span>
+                                <span id="pwd1" class="hex-value"></span>
+                                <span id="pwd2" class="hex-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="vehicleBlocks" class="code-blocks hidden">
+                        <div class="code-block">
+                            <label>Page 36 (0x24) - Vehicle Code</label>
+                            <div class="code-value">
+                                <span>A2 24</span>
+                                <span id="veh-code1" class="hex-value"></span>
+                                <span id="veh-code2" class="hex-value"></span>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <label>Page 38 (0x26) - Vehicle Flag</label>
+                            <div class="code-value">
+                                <span>A2 26</span>
+                                <span id="veh-flag1" class="hex-value"></span>
+                                <span id="veh-flag2" class="hex-value"></span>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <label>Page 43 (0x2B) - Password</label>
+                            <div class="code-value">
+                                <span>A2 2B</span>
+                                <span id="veh-pwd1" class="hex-value"></span>
+                                <span id="veh-pwd2" class="hex-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <img id="itemImage" class="item-image" alt="" />
+                </div>
+            </div>
+
+            <div id="error" class="error hidden"></div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

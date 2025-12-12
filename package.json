@@ -1,0 +1,19 @@
+{
+  "name": "dimensions-tag",
+  "version": "2.0.0",
+  "description": "Dimensions Tag Generator",
+  "type": "module",
+  "repository": "https://github.com/ags131/node-ld",
+  "scripts": {
+    "docker:build": "docker build -t dimensions-tag .",
+    "docker:buildamd64": "docker buildx build --platform linux/amd64 -t dimensions-tag .",
+    "docker:run": "docker run -d -p 80:80 --name dimensions-tag-app dimensions-tag",
+    "docker:stop": "docker stop dimensions-tag-app && docker rm dimensions-tag-app",
+    "docker:publish": "docker tag dimensions-tag ${DOCKER_USERNAME}/dimensions-tag:latest && docker push ${DOCKER_USERNAME}/dimensions-tag:latest",
+    "start": "npm run start:backend & sleep 1 && npm run start:frontend",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && python3 -m http.server 8080"
+  },
+  "author": "",
+  "license": "ISC"
+}
