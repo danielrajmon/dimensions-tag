@@ -2,9 +2,6 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Frontend port
-ENV NGINX_PORT=80
-
 # Copy backend files
 COPY backend/package*.json ./
 RUN npm install
@@ -24,7 +21,7 @@ RUN mkdir -p /run/nginx
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'cat > /etc/nginx/http.d/default.conf <<EOF' >> /app/start.sh && \
     echo 'server {' >> /app/start.sh && \
-    echo '    listen $NGINX_PORT;' >> /app/start.sh && \
+    echo '    listen 80;' >> /app/start.sh && \
     echo '    root /usr/share/nginx/html;' >> /app/start.sh && \
     echo '    index index.html;' >> /app/start.sh && \
     echo '    location / {' >> /app/start.sh && \
