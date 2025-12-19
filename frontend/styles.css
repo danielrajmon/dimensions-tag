@@ -84,10 +84,27 @@ main {
     appearance: none;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+/* Make select dropdowns appear borderless */
+.form-group select {
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--dark-bg);
+}
+
+.form-group select:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove the native dropdown arrow background on some browsers */
+.form-group select::-ms-expand {
+    display: none;
 }
 
 .form-group small {

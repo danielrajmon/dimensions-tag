@@ -44,6 +44,21 @@ function updateItemSelect() {
         option.textContent = `${item.name}${item.world ? ' (' + item.world + ')' : ''}`;
         itemSelect.appendChild(option);
     });
+    // If nothing is selected after populating, hide the result area and clear any previous data
+    if (!itemSelect.value) {
+        const result = document.getElementById('result');
+        const error = document.getElementById('error');
+        result.classList.add('hidden');
+        error.classList.add('hidden');
+
+        // clear displayed values
+        const itemName = document.getElementById('itemName');
+        if (itemName) itemName.textContent = '';
+        const itemImage = document.getElementById('itemImage');
+        if (itemImage) itemImage.classList.remove('visible');
+        ['char1','char2','char3','char4','pwd1','pwd2','veh-code1','veh-code2','veh-flag1','veh-flag2','veh-pwd1','veh-pwd2']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
+    }
 }
 
 // Handle form submission
@@ -70,11 +85,15 @@ async function handleSubmit(event) {
 async function generateTag(formattedUid, characterId, type) {
     // Normalize UID (remove spaces)
     const uid = formattedUid.trim().replace(/\s+/g, '');
+    const itemSelect = document.getElementById('item');
 
+    // If UID is invalid or missing, show an error (no select borders per UI decision)
     if (!uid || uid.length !== 14) {
         showError('UID must be 14 hex characters');
         return;
     }
+
+    // If UID is valid but no item selected, just show an error (don't mark select red)
     if (!characterId) {
         showError('Please select an item before generating');
         return;
@@ -99,6 +118,8 @@ async function generateTag(formattedUid, characterId, type) {
         const data = await response.json();
         displayResult(data);
         lastGenerated = { uid: formattedUid, item: characterId, type };
+
+        // success — nothing to style on the select (dropdowns are borderless)
     } catch (error) {
         showError(error.message);
     }
@@ -163,6 +184,9 @@ function showError(message) {
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
 
+    // Format and validate UID input
+    const uidInput = document.getElementById('uid');
+
     document.getElementById('type').addEventListener('change', updateItemSelect);
     document.getElementById('tagForm').addEventListener('submit', handleSubmit);
 
@@ -171,7 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const formatted = uidInput.value;
         const selectedItem = document.getElementById('item').value;
         const selectedType = document.getElementById('type').value;
-        if (formatted.length === 17 && selectedItem && (formatted !== lastGenerated.uid || selectedItem !== lastGenerated.item || selectedType !== lastGenerated.type)) {
+
+        // If nothing is selected, hide results and return
+        if (!selectedItem) {
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('error').classList.add('hidden');
+            return;
+        }
+
+        if (formatted.length === 17 && (formatted !== lastGenerated.uid || selectedItem !== lastGenerated.item || selectedType !== lastGenerated.type)) {
             generateTag(formatted, selectedItem, selectedType);
         }
     });
@@ -185,9 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
             generateTag(formatted, selectedItem, selectedType);
         }
     });
-    
-    // Format and validate UID input
-    const uidInput = document.getElementById('uid');
+
+    // UID input listener
     uidInput.addEventListener('input', (e) => {
         // Remove spaces and non-hex characters, convert to uppercase
         let value = e.target.value.replace(/[^0-9A-Fa-f]/g, '').toUpperCase();
@@ -206,12 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
             uidInput.style.borderColor = 'var(--success-color)';
             uidInput.style.boxShadow = '0 0 0 2px rgba(76, 175, 80, 0.2)';
 
-            // If the UID reached full length and it's different from the last generated UID,
-            // trigger an automatic regeneration (only if an item/type is selected).
+            // If the UID reached full length and it's different from the last generated
+            // combination (uid/item/type), trigger an automatic regeneration.
             const selectedItem = document.getElementById('item').value;
             const selectedType = document.getElementById('type').value;
-            if (formatted !== lastGeneratedUid && selectedItem) {
-                // fire-and-forget; generateTag will update UI and set lastGeneratedUid
+            if (selectedItem && (formatted !== lastGenerated.uid || selectedItem !== lastGenerated.item || selectedType !== lastGenerated.type)) {
                 generateTag(formatted, selectedItem, selectedType);
             }
         } else if (formatted.length > 0) {
