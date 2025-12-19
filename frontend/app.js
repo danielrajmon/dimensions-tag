@@ -8,7 +8,7 @@ console.log('📡 Connecting to backend at', API_URL);
 
 let characters = [];
 let vehicles = [];
-let lastGeneratedUid = '';
+let lastGenerated = { uid: '', item: '', type: '' };
 
 // Load characters and vehicles on page load
 async function loadData() {
@@ -98,7 +98,7 @@ async function generateTag(formattedUid, characterId, type) {
 
         const data = await response.json();
         displayResult(data);
-        lastGeneratedUid = formattedUid; // remember the formatted value to avoid duplicate calls
+        lastGenerated = { uid: formattedUid, item: characterId, type };
     } catch (error) {
         showError(error.message);
     }
@@ -165,6 +165,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('type').addEventListener('change', updateItemSelect);
     document.getElementById('tagForm').addEventListener('submit', handleSubmit);
+
+    // When the selected item changes, refresh generated data if UID is full
+    document.getElementById('item').addEventListener('change', () => {
+        const formatted = uidInput.value;
+        const selectedItem = document.getElementById('item').value;
+        const selectedType = document.getElementById('type').value;
+        if (formatted.length === 17 && selectedItem && (formatted !== lastGenerated.uid || selectedItem !== lastGenerated.item || selectedType !== lastGenerated.type)) {
+            generateTag(formatted, selectedItem, selectedType);
+        }
+    });
+
+    // Also attempt refresh when the type changes (runs after updateItemSelect listener)
+    document.getElementById('type').addEventListener('change', () => {
+        const formatted = uidInput.value;
+        const selectedItem = document.getElementById('item').value;
+        const selectedType = document.getElementById('type').value;
+        if (formatted.length === 17 && selectedItem && (formatted !== lastGenerated.uid || selectedItem !== lastGenerated.item || selectedType !== lastGenerated.type)) {
+            generateTag(formatted, selectedItem, selectedType);
+        }
+    });
     
     // Format and validate UID input
     const uidInput = document.getElementById('uid');
