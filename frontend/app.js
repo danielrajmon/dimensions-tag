@@ -8,6 +8,7 @@ console.log('📡 Connecting to backend at', API_URL);
 
 let characters = [];
 let vehicles = [];
+let lastGeneratedUid = '';
 
 // Load characters and vehicles on page load
 async function loadData() {
@@ -62,12 +63,31 @@ async function handleSubmit(event) {
     document.getElementById('result').classList.add('hidden');
     document.getElementById('error').classList.add('hidden');
 
+    await generateTag(document.getElementById('uid').value, characterId, type);
+}
+
+// Generate tag data for given UID, characterId and type and display result
+async function generateTag(formattedUid, characterId, type) {
+    // Normalize UID (remove spaces)
+    const uid = formattedUid.trim().replace(/\s+/g, '');
+
+    if (!uid || uid.length !== 14) {
+        showError('UID must be 14 hex characters');
+        return;
+    }
+    if (!characterId) {
+        showError('Please select an item before generating');
+        return;
+    }
+
+    // Hide previous results and errors
+    document.getElementById('result').classList.add('hidden');
+    document.getElementById('error').classList.add('hidden');
+
     try {
         const response = await fetch(`${API_URL}/generate`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ uid, characterId, type })
         });
 
@@ -78,6 +98,7 @@ async function handleSubmit(event) {
 
         const data = await response.json();
         displayResult(data);
+        lastGeneratedUid = formattedUid; // remember the formatted value to avoid duplicate calls
     } catch (error) {
         showError(error.message);
     }
@@ -164,6 +185,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (formatted.length === 17) {
             uidInput.style.borderColor = 'var(--success-color)';
             uidInput.style.boxShadow = '0 0 0 2px rgba(76, 175, 80, 0.2)';
+
+            // If the UID reached full length and it's different from the last generated UID,
+            // trigger an automatic regeneration (only if an item/type is selected).
+            const selectedItem = document.getElementById('item').value;
+            const selectedType = document.getElementById('type').value;
+            if (formatted !== lastGeneratedUid && selectedItem) {
+                // fire-and-forget; generateTag will update UI and set lastGeneratedUid
+                generateTag(formatted, selectedItem, selectedType);
+            }
         } else if (formatted.length > 0) {
             uidInput.style.borderColor = 'var(--error-color)';
             uidInput.style.boxShadow = '0 0 0 2px rgba(244, 67, 54, 0.2)';
